@@ -1,0 +1,92 @@
+[pi4]
+#########
+# uart configuration
+#
+# uart  hardware  path         connector  tx             rx
+# 1     mini      /dev/ttyS0   Serial 1   GPIO14 PIN 8   GPIO15 PIN 10
+# 3     pl011     /dev/ttyAMA1 Serial 3   GPIO4  PIN 7   GPIO5  PIN 29
+# 4     pl011     /dev/ttyAMA2 Serial 4   GPIO8  PIN 24  GPIO9  PIN 21
+# 5     pl011     /dev/ttyAMA3 Serial 5   GPIO12 PIN 32  GPIO13 PIN 33
+
+# enable the uart1 dtoverlay to be applied
+# this fixes the videocore frequency on raspberry pi 4 to 500MHz
+# this is because the uart1 clock is derived from videocore clock
+enable_uart=1
+
+dtoverlay=uart1
+dtoverlay=uart3
+dtoverlay=uart4
+dtoverlay=uart5
+
+#########
+# i2c configuration
+#
+# i2c0 - internal bus
+# SCL0 GPIO1 PIN 28
+# SDA0 GPIO0 PIN 27
+# CAT24C32 @ 0x50
+#
+# i2c1 - internal bus
+# SCL1 GPIO3 PIN 5
+# SDA1 GPIO2 PIN 3
+# AK09915 @ 0x0C
+# MMC5883 @ 0x30
+# ADS1115 @ 0x48
+#
+# i2c4 - internal bus
+# SCL4 GPIO7 PIN 26
+# SDA4 GPIO6 PIN 31
+# PCA9685 @ 0x40
+# BMP280  @ 0x76
+#
+# i2c6 - external bus for i2c connectors
+# SCL6 GPIO23 PIN 16
+# SDA6 GPIO22 PIN 15
+#
+# NOTE: the i2c-dev kernel module needs to be loaded for the i2c bus to be accessible under
+# /dev/i2c-*
+# `sudo modprobe i2c-dev` or add `i2c-dev` to /etc/modules-load.d/modules.conf
+
+# enable i2c0 mux
+# after kernel 5, i2c0 is muxed between the camera/dsi i2c bus on GPIO 44/45
+# and the i2c bus on GPIO 0/1
+# this creates 3 devices: i2c-0, i2c-10, and i2c-11
+# i2c-0: the i2c bus on the header pins (GPIO 0/1)
+# i2c-10: the i2c bus on the camera/dsi pins (GPIO 44/45)
+# i2c-11: the parent i2c device/mux. accessing this device uses whichever of the child devices was accessed
+# do not use this in combination with dtoverlay=i2c0, or with dtparam=i2c_arm=on
+dtparam=i2c_vc=on
+
+dtoverlay=i2c1
+dtoverlay=i2c4,pins_6_7
+dtoverlay=i2c6,pins_22_23
+
+#########
+# spi configuration
+
+dtparam=spi=on
+
+# spi0 bus specially set up to drive neopixel rgb led
+# MOSI0 GPIO10 PIN 19 neopixel DIN /dev/spi0.0
+dtoverlay=spi0-led
+
+# spi1 bus with 3 chip selects
+# MOSI1 GPIO20 PIN 38
+# MISO1 GPIO19 PIN 35
+# SCLK1 GPIO21 PIN 40
+# CS0   GPIO18 PIN 12 not connected
+# CS1   GPIO17 PIN 11 not connected
+# CS2   GPIO16 PIN 36 ICM20602 /dev/spi1.2
+dtoverlay=spi1-3cs
+
+#########
+# gpio configuration
+
+# User LEDs - output drive high
+# LED1 GPIO24 PIN 18
+# LED2 GPIO25 PIN 22
+# LED3 GPIO11 PIN 23
+gpio=11,24,25=op,pu,dh
+
+# PWM output enable gpio 37 output drive low
+gpio=37=op,pd,dl

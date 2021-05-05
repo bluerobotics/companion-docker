@@ -29,3 +29,6 @@ done
 # Remove any console serial configuration
 echo "- Configure serial."
 sudo sed -e 's/console=serial[0-9],[0-9]*\ //' -i /boot/cmdline.txt
+
+echo "- Run rpi update."
+sudo rpi-update
