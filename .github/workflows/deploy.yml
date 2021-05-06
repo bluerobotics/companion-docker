@@ -85,6 +85,7 @@ jobs:
         if: ${{ matrix.docker == 'core' }}
         run: |
           # Check if the image size is lower than our limit
+          docker image list
           LIMIT_SIZE_MB=700
           IMAGE_SIZE_MB=$(( $(docker inspect current_image --format {{.Size}})/(2**20) ))
           echo "Core size is: $IMAGE_SIZE_MB MB"
