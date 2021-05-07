@@ -1,0 +1,7 @@
+body {
+    background-color: #ECF0F5;
+}
+
+.disabled {
+    cursor: not-allowed;
+}
